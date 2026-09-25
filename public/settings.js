@@ -4,6 +4,8 @@ const PERIODS = [14, 30, 60, 90, 180, 365];
 const INTEGRATION = [['squash', 'Squash merges'], ['merge', 'Merge commits'], ['any', 'Anything']];
 const PROMOTION = [['merge', 'Merge commits'], ['squash', 'Squash merges'], ['any', 'Anything']];
 const DEFAULT_FLOW = { integration: 'squash', promotion: 'merge' };
+const THEMES = [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']];
+const THEME_KEY = 'branch-graph:theme'; // theme.js reads it before the page paints
 
 const json = (method, body) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 const sourceOf = (repo) => repo.url ?? repo.path;
@@ -16,6 +18,19 @@ function select(options, value, props = {}) {
 
 function field(label, control, hint) {
   return h('label', { class: 'field' }, h('span', { class: 'field-label' }, label), control, hint ? h('span', { class: 'field-hint' }, hint) : null);
+}
+
+const currentTheme = () => document.documentElement.dataset.theme ?? 'system';
+
+/** A viewer preference, not part of the config: it applies and is stored in this browser right away. */
+function setTheme(theme) {
+  const root = document.documentElement;
+  if (theme === 'system') delete root.dataset.theme;
+  else root.dataset.theme = theme;
+  try {
+    if (theme === 'system') localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, theme);
+  } catch { /* storage unavailable */ }
 }
 
 /**
@@ -141,6 +156,12 @@ export async function openSettings({ project, onSaved }) {
     .then((list) => datalist.replaceChildren(...list.map((item) => h('option', { value: item.value }, item.hint))))
     .catch(() => {});
 
+  /* ----- Appearance ----- */
+  const theme = h('div', { class: 'segmented', role: 'radiogroup', 'aria-label': 'Theme' },
+    THEMES.map(([value, label]) => h('label', {},
+      h('input', { type: 'radio', name: 'theme', value, checked: value === currentTheme(), onchange: () => setTheme(value) }),
+      h('span', {}, label))));
+
   /* ----- Save ----- */
   const saveMsg = h('div', { class: 'state error save-msg', hidden: true });
   const saveBtn = h('button', { type: 'submit', class: 'primary' }, 'Save');
@@ -206,7 +227,12 @@ export async function openSettings({ project, onSaved }) {
         h('p', { class: 'section-hint' }, 'Branches in promotion order. The first is where features land.'),
         repoList,
         h('div', { class: 'add-repo' }, addInput, addBtn, datalist),
-        addMsg)),
+        addMsg),
+
+      h('section', {},
+        h('h3', {}, 'Appearance'),
+        h('p', { class: 'section-hint' }, 'For this browser only. Applies right away, without Save.'),
+        theme)),
 
     h('footer', { class: 'modal-foot' },
       saveMsg,

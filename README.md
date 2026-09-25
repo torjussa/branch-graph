@@ -48,7 +48,7 @@ Prefer to install it? Run `npm install -g branch-graph` and use `branch-graph`. 
   - A hollow dot is a commit that hasn't reached the next branch yet.
   - Hover a merge to see and highlight the commits it brought in. Click any commit to open it on GitHub.
 - **Flow checks** (optional) flag commits that break your branch flow, e.g. a squash merge on `test` or a hotfix straight to `main`.
-- **Settings** (cog button) edits the config: repos, branches and their order, flow rules and period. Saving takes effect without a restart.
+- **Settings** (cog button) edits the config: repos, branches and their order, flow rules and period. Saving takes effect without a restart. It also has the theme (System, Light or Dark), which is saved in your browser rather than the config.
 
 Data updates when you start the tool and when you press **Fetch**. There is no background polling.
 
