@@ -1,6 +1,6 @@
 {
   "name": "branch-graph",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pending promotions, commits missing upstream and flow checks for long-lived branches (development → test → main) across several git repos.",
   "keywords": [
     "git",
