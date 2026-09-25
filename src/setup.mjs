@@ -41,7 +41,8 @@ function prompter() {
 }
 
 const slugify = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const baseName = (url) => url.replace(/\/+$/, '').split(/[/:]/).pop().replace(/\.git$/, '');
+/** Repo name from a URL or path (also Windows paths), reduced to characters a repo name allows. */
+const baseName = (url) => url.replace(/[\\/]+$/, '').split(/[\\/:]/).pop().replace(/\.git$/, '').replace(/[^\w.-]+/g, '-');
 const stageOf = (branch) => STAGES.findIndex((group) => group.includes(branch));
 
 /** Default branch and branch list of a remote, without cloning. */
