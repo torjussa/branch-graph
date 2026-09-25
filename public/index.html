@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Branch graph</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3v10M3 8c5 0 5-5 10-5' stroke='%232a78d6' stroke-width='2' fill='none'/%3E%3Ccircle cx='3' cy='13' r='2' fill='%232a78d6'/%3E%3Ccircle cx='13' cy='3' r='2' fill='%23eb6834'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="bar">
+    <h1 id="project">Branch graph</h1>
+
+    <div class="group">
+      <span class="group-label" id="repos-label">Repos</span>
+      <div id="repo-toggles" class="toggles" role="group" aria-labelledby="repos-label"></div>
+    </div>
+
+    <div class="group">
+      <span class="group-label" id="flags-label" title="Flag commits that break the branch flow in the config">Flow checks</span>
+      <div id="flags" class="segmented" role="radiogroup" aria-labelledby="flags-label"></div>
+    </div>
+
+    <div class="group">
+      <span class="group-label" id="zoom-label">Zoom</span>
+      <div class="segmented" role="group" aria-labelledby="zoom-label">
+        <button id="zoom-out" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+        <button id="zoom-in" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+      </div>
+    </div>
+
+    <div class="group fetch">
+      <span class="group-label" id="fetched">Not fetched</span>
+      <div class="buttons">
+        <button id="refresh" type="button" class="primary" title="git fetch all repos and reload">Fetch</button>
+        <button id="settings" type="button" class="icon-btn" aria-label="Settings" title="Settings: repos, branches, flow rules, period">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="status" class="status" aria-label="Branch status"></section>
+    <section class="graph-card" aria-label="Branch graph">
+      <div id="graph" class="scroller"></div>
+      <div id="legend" class="legend"></div>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

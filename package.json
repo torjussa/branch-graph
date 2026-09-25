@@ -1,0 +1,46 @@
+{
+  "name": "branch-graph",
+  "version": "0.1.0",
+  "description": "See where every commit is across dev → test → prod branches in all your repos. A live, multi-repo alternative to GitHub's network graph, with promotion status and flow checks.",
+  "keywords": [
+    "git",
+    "github",
+    "network-graph",
+    "branch-graph",
+    "git-graph",
+    "branch-visualization",
+    "promotion",
+    "release-status",
+    "environment-branches",
+    "gitflow",
+    "multi-repo",
+    "cli",
+    "developer-tools"
+  ],
+  "homepage": "https://github.com/torjussa/branch-graph#readme",
+  "bugs": "https://github.com/torjussa/branch-graph/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/torjussa/branch-graph.git"
+  },
+  "license": "MIT",
+  "author": "Torjus Sæthre",
+  "type": "module",
+  "bin": {
+    "branch-graph": "bin/branch-graph.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "public/",
+    "skills/"
+  ],
+  "scripts": {
+    "start": "node bin/branch-graph.mjs",
+    "test": "node --test",
+    "demo": "node bin/branch-graph.mjs demo"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

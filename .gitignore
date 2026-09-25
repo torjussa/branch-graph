@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+# Configs are personal (repo URLs, local paths): never commit them.
+/configs/
