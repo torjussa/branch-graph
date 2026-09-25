@@ -15,7 +15,7 @@ Run it as `npx -y branch-graph` (or `branch-graph` if installed globally).
    ```bash
    npx -y branch-graph init --name "<project>" --repo <org/repo> --repo <org/repo2>
    ```
-   Each `--repo` is a GitHub URL, `org/repo` or local folder. Branches are detected (default branch plus `test`, `main`, …). To set them: `--repo org/repo=development,test,main`. Confirm the repo list with the user before creating a config.
+   Each `--repo` is a git URL, a GitHub `org/repo` or a local folder. Branches are detected (default branch plus `test`, `main`, …). To set them: `--repo org/repo=development,test,main`. Confirm the repo list with the user before creating a config.
 
 2. **Get the status.**
    ```bash
@@ -23,7 +23,7 @@ Run it as `npx -y branch-graph` (or `branch-graph` if installed globally).
    ```
    This fetches first. Add `--no-fetch` to reuse the last fetch, or `--days <n>` to change how far back flow checks look. Done when the output parses as JSON and no repo has an `error` or `fetchError` (report those to the user if they persist).
 
-3. **Answer from the JSON**, repo by repo and pair by pair (reference below). Quote commit subjects and short SHAs, and give `compareUrl` for any pair with pending work.
+3. **Answer from the JSON**, repo by repo and pair by pair (reference below). Quote commit subjects and short SHAs, and give `compareUrl` for any pair with pending work. It uses GitHub's URL format, so leave it out when `webUrl` is on another host.
 
 For a visual graph, suggest the user run `npx branch-graph <config>`: it opens a local page with the network graph and a settings dialog.
 

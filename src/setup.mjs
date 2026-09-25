@@ -5,6 +5,7 @@ import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { CONFIG_DIR, ROOT, URL_PATTERN, expandHome, formatConfig, isSafeRef, loadConfig, tilde } from './config.mjs';
 import { git } from './git.mjs';
+import { remoteLabel } from '../public/remote.js';
 
 /** Likely pipeline stages, upstream first. Used to suggest the next branch. */
 const STAGES = [
@@ -138,7 +139,7 @@ async function localClones(dir) {
   const clones = [];
   for (const d of dirs.filter((x) => x !== ROOT && existsSync(path.join(x, '.git')))) {
     const remote = await git(d, ['remote', 'get-url', 'origin']).then((u) => u.trim()).catch(() => '');
-    clones.push({ label: path.basename(d), hint: remote.replace(/^.*github\.com[/:]/, '').replace(/\.git$/, '') || 'no origin', input: d, value: tilde(d) });
+    clones.push({ label: path.basename(d), hint: remote ? remoteLabel(remote) : 'no origin', input: d, value: tilde(d) });
   }
   return clones;
 }
@@ -199,7 +200,7 @@ async function askRepos(io, sources, repos) {
 
     if (source === 'type') {
       const hint = sources.length ? ' (Enter to go back)' : hasRepos ? ' (Enter to finish)' : '';
-      const input = await io.ask(`\n${bold('Repo')}: GitHub URL, org/repo or local folder${dim(hint)}`);
+      const input = await io.ask(`\n${bold('Repo')}: git URL, GitHub org/repo or local folder${dim(hint)}`);
       if (input) return [{ input, label: null }];
       if (!sources.length && hasRepos) return null;
       if (!sources.length) console.log(red('  Add at least one repo.'));

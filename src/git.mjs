@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { access, mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { webUrlFromRemote } from '../public/remote.js';
 
 const ENV = { ...process.env, GIT_TERMINAL_PROMPT: '0', LC_ALL: 'C' };
 
@@ -66,16 +67,12 @@ export async function listBranches(repo) {
     .filter((b) => b && b !== 'HEAD');
 }
 
-/** https web URL of a GitHub-style remote, or null. */
+/** https web URL of a repo: `webUrl` from the config, else worked out from the remote. Null if unknown. */
 export async function webUrlOf(repo) {
   if (repo.webUrl) return repo.webUrl.replace(/\/$/, '');
   let url = repo.url;
   if (!url) {
     try { url = (await git(repo.dir, ['remote', 'get-url', repo.remote])).trim(); } catch { return null; }
   }
-  const ssh = url.match(/^[\w.-]+@([\w.-]+):(.+?)(\.git)?$/);
-  if (ssh) return `https://${ssh[1]}/${ssh[2]}`;
-  const http = url.match(/^https?:\/\/(?:[^@/]+@)?([^/]+)\/(.+?)(\.git)?\/?$/);
-  if (http) return `https://${http[1]}/${http[2]}`;
-  return null;
+  return webUrlFromRemote(url);
 }

@@ -14,7 +14,7 @@
 | `src/server.mjs` | HTTP API and static files for the page |
 | `src/setup.mjs` | Interactive and non-interactive `init`, repo lookup, branch suggestions |
 | `src/demo.mjs` | Fake repos, used by `demo` and by the test fixture |
-| `public/` | The page: plain ES modules, no build step (`lib.js` holds DOM helpers) |
+| `public/` | The page: plain ES modules, no build step (`lib.js` holds DOM helpers). `remote.js` (remote URL to web link and label) is also imported by `src/`, so it stays free of DOM and Node APIs |
 | `skills/branch-graph/SKILL.md` | Agent skill shipped with the package |
 | `test/` | `node:test` suites; `fixture.mjs` builds a throwaway repo covering every flow case |
 

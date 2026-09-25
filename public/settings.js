@@ -1,4 +1,5 @@
 import { api, h, icon } from './lib.js';
+import { remoteLabel } from './remote.js';
 
 const PERIODS = [14, 30, 60, 90, 180, 365];
 const INTEGRATION = [['squash', 'Squash merges'], ['merge', 'Merge commits'], ['any', 'Anything']];
@@ -9,7 +10,7 @@ const THEME_KEY = 'branch-graph:theme'; // theme.js reads it before the page pai
 
 const json = (method, body) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 const sourceOf = (repo) => repo.url ?? repo.path;
-const sourceLabel = (repo) => (repo.url ? repo.url.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') : repo.path);
+const sourceLabel = (repo) => (repo.url ? remoteLabel(repo.url) : repo.path);
 const sameSource = (a, b) => sourceOf(a).toLowerCase() === sourceOf(b).toLowerCase();
 
 function select(options, value, props = {}) {
@@ -117,7 +118,7 @@ export async function openSettings({ project, onSaved }) {
   /* ----- Add repo ----- */
   const datalist = h('datalist', { id: 'repo-suggestions' });
   const addInput = h('input', {
-    type: 'text', list: 'repo-suggestions', placeholder: 'GitHub URL, org/repo or local folder', 'aria-label': 'Repo to add', spellcheck: 'false',
+    type: 'text', list: 'repo-suggestions', placeholder: 'Git URL, GitHub org/repo or local folder', 'aria-label': 'Repo to add', spellcheck: 'false',
     onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); addRepo(); } },
   });
   const addBtn = h('button', { type: 'button', onclick: () => addRepo() }, 'Add repo');

@@ -26,7 +26,7 @@ Usage:
 
   config   Config name (saved in ${tilde(CONFIG_DIR)}) or path to a .json file.
            Without it: the config used last, or setup if there is none yet.
-  repo     GitHub URL, org/repo or local folder. Branches default to the repo's default branch
+  repo     Git URL, GitHub org/repo or local folder. Branches default to the repo's default branch
            plus likely next stages (e.g. development → test → main).
            Set them yourself with org/repo=development,test,main
 

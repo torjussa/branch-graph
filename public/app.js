@@ -1,4 +1,5 @@
 import { api, h, icon, key, plural, s } from './lib.js';
+import { siteName } from './remote.js';
 import { openSettings } from './settings.js';
 
 const LABEL_W = 190;
@@ -227,7 +228,7 @@ function renderStatus() {
 function statusCard(repo) {
   const d = data[repo.name];
   const head = h('div', { class: 'card-head' }, h('h2', {}, repo.name),
-    repo.webUrl ? h('a', { href: repo.webUrl, target: '_blank', rel: 'noopener' }, 'GitHub ↗') : null);
+    repo.webUrl ? h('a', { href: repo.webUrl, target: '_blank', rel: 'noopener' }, `${siteName(repo.webUrl)} ↗`) : null);
   if (!d) return h('article', { class: 'card' }, head, h('p', { class: 'muted' }, 'Loading…'));
   if (d.error) return h('article', { class: 'card' }, head, h('div', { class: 'state error' }, icon('alert'), d.error));
 
@@ -675,7 +676,7 @@ function commitTooltip(repoName, sha) {
 
   const tipOf = Object.entries(d.branches).filter(([, br]) => br.tip === sha).map(([name]) => name);
   if (tipOf.length) parts.push(h('div', { class: 'tt-meta' }, `Tip of ${tipOf.join(', ')}`));
-  if (d.webUrl) parts.push(h('div', { class: 'tt-hint' }, 'Click to open on GitHub'));
+  if (d.webUrl) parts.push(h('div', { class: 'tt-hint' }, `Click to open on ${siteName(d.webUrl)}`));
   return parts;
 }
 

@@ -113,11 +113,21 @@ npx branch-graph install-skill --dir .claude/skills      # or into the current p
 
 Other agents can read [`skills/branch-graph/SKILL.md`](skills/branch-graph/SKILL.md) directly. It also documents the JSON fields.
 
+## Git hosts
+
+The graph, promotion status and code diff come from git itself, so they work with any remote. Some parts are GitHub-only for now:
+
+- Commit and compare links use GitHub's URL format. The link to the repo's page works on most hosts.
+- Flow checks read PR numbers from GitHub's merge and squash messages (`Merge pull request #12 …`, `… (#12)`).
+- Setup lists repos from GitHub orgs (via `gh`), and `org/repo` means a GitHub repo. For other hosts, type the URL or pick a local clone.
+
+Support for other hosts is tracked in the [issues](https://github.com/torjussa/branch-graph/issues?q=label%3Agit-host).
+
 ## Troubleshooting
 
 - **"Could not read …" or a fetch fails:** branch-graph uses your normal git login. Check that `git ls-remote <url>` works in a terminal. For private repos, set up HTTPS credentials (e.g. `gh auth login`) or an SSH key. branch-graph never asks for a password.
 - **No GitHub orgs in setup:** install the [`gh`](https://cli.github.com) CLI and run `gh auth login`, or type the repo instead.
-- **Links go to the wrong place:** commit and compare links use GitHub's URL format. For GitLab, Bitbucket or others, set `webUrl` in the config; links may still not match those sites' formats.
+- **Links go to the wrong place:** set `webUrl` in the config when the repo's web page isn't at the remote's address, e.g. for a mirror. On hosts other than GitHub, commit and compare links don't work yet (see [Git hosts](#git-hosts)).
 - **Port in use:** the next free port is used, or set one with `--port`.
 
 ## How it works
