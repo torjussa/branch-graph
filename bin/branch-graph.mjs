@@ -4,11 +4,11 @@ import { cpSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { CONFIG_DIR, ROOT, configNames, expandHome, loadConfig, migrateOldConfigs, resolveConfigPath, tilde } from '../src/config.mjs';
+import { CONFIG_DIR, ROOT, configNames, defaultConfig, expandHome, loadConfig, migrateOldConfigs, rememberConfig, resolveConfigPath, tilde } from '../src/config.mjs';
 import { createDemo } from '../src/demo.mjs';
 import { ensureRepo } from '../src/git.mjs';
 import { fetchAll, startServer } from '../src/server.mjs';
-import { chooseConfig, initFromArgs, runSetup } from '../src/setup.mjs';
+import { initFromArgs, runSetup } from '../src/setup.mjs';
 import { collectStatus, formatStatus } from '../src/status.mjs';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -25,7 +25,7 @@ Usage:
   branch-graph install-skill         Install the agent skill (Claude Code: ~/.claude/skills)
 
   config   Config name (saved in ${tilde(CONFIG_DIR)}) or path to a .json file.
-           Without it: setup starts if there is no config, a list is shown if there are several.
+           Without it: the config used last, or setup if there is none yet.
   repo     GitHub URL, org/repo or local folder. Branches default to the repo's default branch
            plus likely next stages (e.g. development → test → main).
            Set them yourself with org/repo=development,test,main
@@ -85,28 +85,28 @@ const fail = (msg) => {
 };
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-/** Config file to run: from the argument, or picked / created interactively. Null means exit. */
+/** Config file to run: from the argument, the one used last, or created interactively. Null means exit. */
 async function pickConfigFile(arg, { allowSetup }) {
-  const setup = async () => {
-    const { file, start } = await runSetup();
-    return start ? file : null;
-  };
   if (arg) return resolveConfigPath(arg);
   const names = await configNames();
-  if (names.length === 1) return resolveConfigPath(names[0]);
   if (names.length === 0) {
     if (!allowSetup || !process.stdin.isTTY) fail('No config yet. Run: branch-graph init');
     console.log('No config yet. Starting setup.\n');
-    return setup();
+    const { file, start } = await runSetup();
+    return start ? file : null;
   }
+  if (names.length === 1) return resolveConfigPath(names[0]);
+  // Scripts and agents name the config, so what they get doesn't depend on what ran last.
   if (!process.stdin.isTTY) fail(`Several configs, pass one: ${names.join(', ')}`);
-  const picked = await chooseConfig(names);
-  if (picked) return picked;
-  return allowSetup ? setup() : null;
+  const { name, why } = await defaultConfig(names);
+  const others = names.filter((n) => n !== name).join(', ');
+  console.error(`Using ${name} (${why}). Others: ${others}. Pass a name to switch, or run init to add one.`);
+  return resolveConfigPath(name);
 }
 
 async function prepare(file, log) {
   const config = await loadConfig(file);
+  await rememberConfig(file);
   await Promise.all(config.repos.map((repo) => ensureRepo(repo)));
   const state = { fetchedAt: null, fetchErrors: {}, hosts: new Set() };
   if (!opts['no-fetch']) {
@@ -149,11 +149,13 @@ async function init() {
   if (!opts.repo?.length) {
     if (opts.name) fail('Pass at least one repo: --repo <org/repo>');
     const { file, start } = await runSetup();
+    await rememberConfig(file);
     if (start) await serve(file);
     return;
   }
   const flow = opts['no-flow'] ? false : { integration: opts.integration ?? 'squash', promotion: opts.promotion ?? 'merge' };
   const { file, repos } = await initFromArgs({ name: opts.name, specs: opts.repo, flow, force: opts.force });
+  await rememberConfig(file);
   console.log(`Saved ${tilde(file)}`);
   for (const r of repos) console.log(`  ${r.name}: ${r.branches.join(' → ')}`);
   console.log(`Run: branch-graph ${file.split(/[\\/]/).pop().replace(/\.json$/, '')}`);

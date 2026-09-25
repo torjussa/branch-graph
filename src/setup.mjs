@@ -404,20 +404,3 @@ export async function initFromArgs({ name, specs, flow, days = 60, force = false
   await loadConfig(file);
   return { file, repos };
 }
-
-/** Pick one of several configs, or start setup. Returns a config path or null for setup. */
-export async function chooseConfig(names) {
-  const io = prompter();
-  try {
-    console.log(bold('Configs'));
-    names.forEach((n, i) => console.log(`  ${i + 1}) ${n}`));
-    console.log(`  ${names.length + 1}) ${dim('Set up a new one')}`);
-    for (;;) {
-      const pick = parseInt(await io.ask('Choose', '1'), 10);
-      if (pick >= 1 && pick <= names.length) return path.join(CONFIG_DIR, `${names[pick - 1]}.json`);
-      if (pick === names.length + 1) return null;
-    }
-  } finally {
-    io.close();
-  }
-}

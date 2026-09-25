@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, readdir } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
@@ -74,6 +74,26 @@ export async function configNames() {
 async function describeConfigs() {
   const names = await configNames();
   return names.length ? `Available in ${tilde(CONFIG_DIR)}: ${names.join(', ')}` : `No configs in ${tilde(CONFIG_DIR)}. Run: branch-graph init`;
+}
+
+// Kept with the cache, so the config folder only holds files people write.
+const LAST_USED = path.join(CACHE_DIR, 'last-config');
+
+/** Remember a config from the config folder as the one to run when no name is given. */
+export async function rememberConfig(file) {
+  if (path.dirname(file) !== CONFIG_DIR) return;
+  // Best effort: a read-only cache folder shouldn't stop a run.
+  await mkdir(CACHE_DIR, { recursive: true })
+    .then(() => writeFile(LAST_USED, `${path.basename(file, '.json')}\n`))
+    .catch(() => {});
+}
+
+/** Config to run when no name is given: the one used last, else the most recently saved. */
+export async function defaultConfig(names) {
+  const last = await readFile(LAST_USED, 'utf8').then((s) => s.trim(), () => '');
+  if (names.includes(last)) return { name: last, why: 'last used' };
+  const saved = await Promise.all(names.map((n) => stat(path.join(CONFIG_DIR, `${n}.json`)).then((s) => s.mtimeMs)));
+  return { name: names[saved.indexOf(Math.max(...saved))], why: 'newest' };
 }
 
 export const URL_PATTERN = /^(https?:\/\/|ssh:\/\/|git@|file:\/\/)/;

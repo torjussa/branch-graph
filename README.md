@@ -34,7 +34,7 @@ Setup asks for your repos, then their branches in promotion order:
 - **Repos:** pick from your GitHub orgs (if the [`gh`](https://cli.github.com) CLI is installed and logged in), from git clones in the current folder, or type a URL or `org/repo`.
 - **Branches:** the first defaults to the repo's default branch, and the next ones are suggested (`test`, then `main` or `master`).
 
-When you're done, the graph opens in your browser at `http://localhost:4321`. Next time, run `npx branch-graph <name>`.
+When you're done, the graph opens in your browser at `http://localhost:4321`. Next time, run `npx branch-graph` again: it opens the config you used last. Pass a name (`npx branch-graph <name>`) to open another one, and run `npx branch-graph init` to add one.
 
 Prefer to install it? Run `npm install -g branch-graph` and use `branch-graph`. From source: `git clone https://github.com/torjussa/branch-graph && cd branch-graph && node bin/branch-graph.mjs`.
 
@@ -55,7 +55,7 @@ Data updates when you start the tool and when you press **Fetch**. There is no b
 ## Commands
 
 ```bash
-branch-graph [config]            # fetch and open the graph
+branch-graph [config]            # fetch and open the graph (default: the config used last)
 branch-graph status [config]     # print promotion status; --json for scripts and agents
 branch-graph init                # set up a config step by step
 branch-graph init --name Acme --repo acme/api --repo acme/web   # set up without prompts

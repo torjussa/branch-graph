@@ -60,3 +60,12 @@ test('status prints text and JSON', () => {
 
   assert.equal(run('status', 'missing-config').code, 1);
 });
+
+test('without a terminal, several configs need a name', () => {
+  assert.equal(run('init', '--name', 'Acme', '--repo', fx.work, '--force').code, 0);
+  assert.equal(run('init', '--name', 'Other', '--repo', fx.work, '--force').code, 0);
+
+  const res = run('status', '--no-fetch');
+  assert.equal(res.code, 1);
+  assert.match(res.err, /Several configs, pass one: acme\.local, other\.local/);
+});
