@@ -20,7 +20,7 @@
 
 ## Rules
 
-- **Zero dependencies.** Node ≥ 20 built-ins only, no bundler. The page loads as-is from `public/`.
+- **Zero dependencies.** Node ≥ 22 built-ins only, no bundler. The page loads as-is from `public/`.
 - **Every git argument is validated.** Branch and remote names go through `isSafeRef`, and URLs must match `URL_PATTERN`. git runs through `execFile`, never a shell, so a name like `--upload-pack=…` can't become an option.
 - **Page text goes in text nodes.** Build DOM with `h()` / `s()` from `public/lib.js`. Commit messages and branch names are untrusted.
 - **The server is local only:** it binds to `127.0.0.1` and checks `Host`/`Origin` on every request. Keep that for new endpoints.

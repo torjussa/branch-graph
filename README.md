@@ -22,7 +22,7 @@ GitHub's network graph covers one repo at a time, is cached for hours and shows 
 
 ## Quick start
 
-Requires [Node.js](https://nodejs.org) 20+ and git.
+Requires [Node.js](https://nodejs.org) 22+ and git.
 
 ```bash
 npx branch-graph demo   # try it on generated example repos
