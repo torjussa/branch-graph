@@ -1,5 +1,7 @@
 # branch-graph
 
+[![npm](https://img.shields.io/npm/v/branch-graph)](https://www.npmjs.com/package/branch-graph)
+
 Shows how long-lived branches (such as `development` → `test` → `main`) relate across several git repos: which commits are waiting to be promoted, which are missing upstream, and whether merges follow your branch flow. It runs locally and uses your existing git credentials.
 
 GitHub's network graph shows one repo at a time, is cached for hours and includes every feature branch. branch-graph puts several repos on one timeline, shows only the branches you configure, and is as current as your last fetch.
