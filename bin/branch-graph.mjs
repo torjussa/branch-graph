@@ -13,7 +13,7 @@ import { collectStatus, formatStatus } from '../src/status.mjs';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
-const USAGE = `branch-graph ${version}: see where every commit is across dev → test → prod branches in all your repos.
+const USAGE = `branch-graph ${version}: promotion status and a graph for long-lived branches across several git repos.
 
 Usage:
   branch-graph [config]              Fetch and open the graph in the browser

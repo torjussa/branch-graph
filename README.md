@@ -1,24 +1,13 @@
 # branch-graph
 
-**See where every commit is across your dev → test → prod branches, in all your repos at once.**
+Shows how long-lived branches (such as `development` → `test` → `main`) relate across several git repos: which commits are waiting to be promoted, which are missing upstream, and whether merges follow your branch flow. It runs locally and uses your existing git credentials.
 
-A live, multi-repo alternative to GitHub's network graph. It shows what's waiting to be promoted and what's missing upstream, and checks that merges follow your flow. It runs locally with your own git credentials: no tokens, no server, no dependencies.
+GitHub's network graph shows one repo at a time, is cached for hours and includes every feature branch. branch-graph puts several repos on one timeline, shows only the branches you configure, and is as current as your last fetch.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/torjussa/branch-graph/main/docs/screenshot-dark.png">
   <img alt="branch-graph showing three repos with development, test and main lanes, promotion status cards and merge lines between branches" src="https://raw.githubusercontent.com/torjussa/branch-graph/main/docs/screenshot-light.png">
 </picture>
-
-## Why
-
-If you promote code through long-lived environment branches (`development → test → main`, GitFlow, release branches), you keep asking:
-
-- What's in `test` that isn't in production yet?
-- Did that PR reach `test`? Is `main` behind?
-- Was a hotfix made on `main` and never merged back?
-- Did someone squash-merge a promotion, so the branches now disagree?
-
-GitHub's network graph covers one repo at a time, is cached for hours and shows every feature branch. `branch-graph` covers all your repos on one timeline, shows only the branches you care about, and is up to date whenever you fetch.
 
 ## Quick start
 
@@ -26,31 +15,31 @@ Requires [Node.js](https://nodejs.org) 22+ and git.
 
 ```bash
 npx branch-graph demo   # try it on generated example repos
-npx branch-graph        # set up your own repos, then open the graph
+npx branch-graph        # set up your repos and open the graph
 ```
 
 Setup asks for your repos, then their branches in promotion order:
 
-- **Repos:** pick from your GitHub orgs (if the [`gh`](https://cli.github.com) CLI is installed and logged in), from git clones in the current folder, or type a URL or `org/repo`.
+- **Repos:** pick from your GitHub orgs (needs the [`gh`](https://cli.github.com) CLI, logged in), from git clones in the current folder, or type a URL or `org/repo`.
 - **Branches:** the first defaults to the repo's default branch, and the next ones are suggested (`test`, then `main` or `master`).
 
-When you're done, the graph opens in your browser at `http://localhost:4321`. Next time, run `npx branch-graph` again: it opens the config you used last. Pass a name (`npx branch-graph <name>`) to open another one, and run `npx branch-graph init` to add one.
+The graph then opens at `http://localhost:4321`. After that, `npx branch-graph` opens the config you used last. Pass a name to open another one, or run `npx branch-graph init` to add one.
 
-Prefer to install it? Run `npm install -g branch-graph` and use `branch-graph`. From source: `git clone https://github.com/torjussa/branch-graph && cd branch-graph && node bin/branch-graph.mjs`.
+Install globally with `npm install -g branch-graph`, or run from source: `git clone https://github.com/torjussa/branch-graph && cd branch-graph && node bin/branch-graph.mjs`.
 
 ## What you see
 
-- **Status cards**, one per repo and one row per branch pair:
+- **Status cards**, one per repo, with a row per branch pair:
   - commits and changed files waiting to be promoted, or *In sync*
   - commits on the downstream branch that are missing upstream
   - fast-forwards, where a branch moved without a merge commit
-- **The graph**, with one lane per branch and all repos on one timeline, so a vertical line is the same moment everywhere:
+- **The graph**: one lane per branch, with all repos on the same time axis.
   - A hollow dot is a commit that hasn't reached the next branch yet.
-  - Hover a merge to see and highlight the commits it brought in. Click any commit to open it on GitHub.
+  - Hover a merge to highlight the commits it brought in. Click a commit to open it on GitHub.
 - **Flow checks** (optional) flag commits that break your branch flow, e.g. a squash merge on `test` or a hotfix straight to `main`.
-- **Settings** (cog button) edits the config: repos, branches and their order, flow rules and period. Saving takes effect without a restart. It also has the theme (System, Light or Dark), which is saved in your browser rather than the config.
+- **Settings** (cog button) edits the config: repos, branch order, flow rules and period. Changes apply without a restart. The theme (System, Light or Dark) is also set here and stored in the browser, not the config.
 
-Data updates when you start the tool and when you press **Fetch**. There is no background polling.
+Data is fetched on start and when you press **Fetch**.
 
 ## Commands
 
@@ -67,7 +56,7 @@ Run `branch-graph --help` for all options.
 
 ## Config
 
-Configs are saved in `~/.config/branch-graph/` (`%APPDATA%\branch-graph\` on Windows), one JSON file per project. They're easiest to edit through **Settings** in the page:
+Configs are saved in `~/.config/branch-graph/` (`%APPDATA%\branch-graph\` on Windows), one JSON file per project. Edit them in the page (**Settings**) or by hand:
 
 ```jsonc
 {
@@ -89,8 +78,8 @@ Configs are saved in `~/.config/branch-graph/` (`%APPDATA%\branch-graph\` on Win
 }
 ```
 
-- **`url` or `path`:** a config with `url` works on any machine, so you can share it. With `path`, it reuses a clone you already have; `branch-graph` only runs `git fetch` there and never touches your working tree or local branches.
-- **Optional repo fields:** `remote` (default `origin`) and `webUrl` (for links, when it can't be worked out from the remote).
+- **`url` or `path`:** a config with `url` works on any machine. With `path` it uses an existing clone, where branch-graph only runs `git fetch` and doesn't touch the working tree or local branches.
+- **Optional repo fields:** `remote` (default `origin`) and `webUrl` (for links, when it can't be derived from the remote).
 - **`BRANCH_GRAPH_CONFIG_DIR`** and **`BRANCH_GRAPH_CACHE_DIR`** override the folders.
 
 ### Flow checks
@@ -105,17 +94,17 @@ The first branch is the *integration* branch, where features land. The rest are 
 | `promotion: "squash"` | Merge commits on a promotion branch (error) |
 | `"any"` | Nothing |
 
-Back-merges from a later branch (e.g. `test` into `development`) are never flagged. Flow checks are hidden in the page by default. Turn them on with **Flow checks** in the header.
+Back-merges from a later branch (e.g. `test` into `development`) are never flagged. Flow checks are hidden in the page by default; turn them on with **Flow checks** in the header.
 
 ## For agents and scripts
 
-`branch-graph status --json` prints the promotion status for every repo: pending commits, commits missing upstream, code diff, fast-forwards and flow issues, plus compare links. Progress messages go to stderr, so stdout is clean JSON.
+`branch-graph status --json` prints the status of every repo: pending commits, commits missing upstream, code diff, fast-forwards, flow issues and compare links. Progress messages go to stderr, so stdout is clean JSON.
 
 ```bash
 branch-graph status acme --json --no-fetch | jq '.repos[].pairs[] | {from, to, state, pending: .pending.count}'
 ```
 
-For AI coding agents there's a skill that teaches them when and how to use it. For [Claude Code](https://claude.com/claude-code):
+An agent skill describes when and how to use it. For [Claude Code](https://claude.com/claude-code):
 
 ```bash
 npx branch-graph install-skill                           # installs into ~/.claude/skills
@@ -126,20 +115,20 @@ Other agents can read [`skills/branch-graph/SKILL.md`](skills/branch-graph/SKILL
 
 ## Troubleshooting
 
-- **"Could not read …" or a fetch fails:** `branch-graph` uses your normal git login. Check that `git ls-remote <url>` works in a terminal. For private repos, make sure HTTPS credentials (e.g. `gh auth login`) or an SSH key are set up. It never asks for a password itself.
+- **"Could not read …" or a fetch fails:** branch-graph uses your normal git login. Check that `git ls-remote <url>` works in a terminal. For private repos, set up HTTPS credentials (e.g. `gh auth login`) or an SSH key. branch-graph never asks for a password.
 - **No GitHub orgs in setup:** install the [`gh`](https://cli.github.com) CLI and run `gh auth login`, or type the repo instead.
-- **Links go to the wrong place:** commit and compare links follow GitHub's URL format. For GitLab, Bitbucket or others, set `webUrl` in the config; links may still not match those sites' formats.
-- **Port in use:** the next free port is picked automatically, or set one with `--port`.
+- **Links go to the wrong place:** commit and compare links use GitHub's URL format. For GitLab, Bitbucket or others, set `webUrl` in the config; links may still not match those sites' formats.
+- **Port in use:** the next free port is used, or set one with `--port`.
 
 ## How it works
 
-For each branch, `branch-graph` follows its first-parent history. A commit sits on the first lane, in promotion order, whose history contains it. Merges are drawn from the lane their second parent sits on. "Pending" is `git log to..from`, and the code diff is `git diff to from`, so a squash promotion shows up as *Same code*, not as missing work.
+For each branch, branch-graph follows its first-parent history. A commit is drawn on the first lane, in promotion order, whose history contains it, and a merge is drawn from the lane of its second parent. "Pending" is `git log to..from` and the code diff is `git diff to from`, so a squash promotion shows up as *Same code*, not as missing work.
 
-Everything runs on your machine. The page is served on `127.0.0.1` only and rejects requests from other sites. The only network traffic is `git fetch` or `git clone` to your own remotes, plus `gh` to list repos during setup.
+The page is served on `127.0.0.1` only and rejects requests from other sites. The only network traffic is `git fetch` or `git clone` to your own remotes, and `gh` to list repos during setup.
 
 ## Contributing
 
-Issues and pull requests are welcome. Run `npm test`; it needs no network. See [AGENTS.md](AGENTS.md) for the code map and conventions.
+Issues and pull requests are welcome. `npm test` runs without network access. See [AGENTS.md](AGENTS.md) for the code map and conventions.
 
 ## License
 

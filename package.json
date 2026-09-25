@@ -1,7 +1,7 @@
 {
   "name": "branch-graph",
   "version": "0.1.0",
-  "description": "See where every commit is across dev → test → prod branches in all your repos. A live, multi-repo alternative to GitHub's network graph, with promotion status and flow checks.",
+  "description": "Pending promotions, commits missing upstream and flow checks for long-lived branches (development → test → main) across several git repos.",
   "keywords": [
     "git",
     "github",
