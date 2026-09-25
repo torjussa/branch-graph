@@ -76,7 +76,7 @@ export function formatStatus(status, { color = false } = {}) {
     }
     if (repo.fetchError) lines.push(`  ${red(`fetch failed: ${repo.fetchError}`)}`);
     if (repo.missingBranches) lines.push(`  ${red(`not on remote: ${repo.missingBranches.join(', ')}`)}`);
-    if (!repo.pairs.length) lines.push(`  ${dim('only one branch configured')}`);
+    if (!repo.pairs.length && !repo.missingBranches) lines.push(`  ${dim('only one branch configured')}`);
     for (const p of repo.pairs) {
       const name = `${p.from} → ${p.to}`.padEnd(width);
       let state;
